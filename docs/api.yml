@@ -28,7 +28,7 @@ paths:
         - $ref: '#/components/parameters/SortingDirectionParam'
       responses:
         '200':
-          $ref: '#/components/responses/ATMList'
+          $ref: '#/components/responses/GetATMList'
   /atm/nearest:
     post:
       description: Get the nearest ATMs
@@ -45,7 +45,7 @@ paths:
               $ref: '#/components/schemas/UserDto'
       responses:
         '200':
-          $ref: '#/components/responses/ATMList'
+          $ref: '#/components/responses/GetATMList'
   /departments:
     get:
       description: List all Departments
@@ -60,7 +60,7 @@ paths:
         - $ref: '#/components/parameters/SortingDirectionParam'
       responses:
         '200':
-          $ref: '#/components/responses/DepartmentList'
+          $ref: '#/components/responses/GetDepartmentList'
   /departments/nearest:
     post:
       description: Get the nearest departments
@@ -77,7 +77,7 @@ paths:
               $ref: '#/components/schemas/UserDto'
       responses:
         '200':
-          $ref: '#/components/responses/DepartmentList'
+          $ref: '#/components/responses/GetDepartmentList'
 
 components:
 
@@ -189,20 +189,24 @@ components:
         address:
           type: string
         rko:
-          type: boolean
+          type: string
         officeType:
           type: string
         salePointFormat:
           type: string
         suoAvailability:
-          type: boolean
+          type: string
         hasRamp:
-          type: boolean
+          type: string
+        network:
+          type: string
+        salePointCode:
+          type: string
         latitude:
           type: number
           format: double
         longitude:
-          type: integer
+          type: number
           format: double
         metroStation:
           type: string
@@ -214,34 +218,10 @@ components:
         myBranch:
           type: boolean
 
-#  requestBodies:
-#    getOrder:
-#      description: Body for creating Order
-#      required: true
-#      content:
-#        application/json:
-#          schema:
-#            $ref: '#/components/schemas/OrderDto'
-#
-#    postOrder:
-#      description: Body for creating Order
-#      required: true
-#      content:
-#        application/json:
-#          schema:
-#            $ref: '#/components/schemas/OrderDto'
-#
-#    putOrder:
-#      description: Body for updating Order
-#      required: true
-#      content:
-#        application/json:
-#          schema:
-#            $ref: '#/components/schemas/OrderDto'
 
   responses:
 
-    ATMList:
+    GetATMList:
       description: List of OrderDto with pagination info
       content:
         application/json:
@@ -256,7 +236,7 @@ components:
             allOf:
               - $ref: '#/components/schemas/PageDto'
 
-    DepartmentList:
+    GetDepartmentList:
       description: List of OrderDto with pagination info
       content:
         application/json:
