@@ -6,21 +6,35 @@ info:
 
 servers:
   - url: http://locahost:8080
-    description: Optional server description, e.g. Main (production) server
 
 tags:
-  - name: atms
+  - name: ATM
     description: Everything about ATMs
   - name: Department
     description: Everything about Departments
-  - name: user
-    description: Operations about user
 
 paths:
-  /user/location:
-    post:
+  /atm:
+    get:
+      description: List all Departments
+      operationId: GetATMList
       tags:
-        - user
+        - ATM
+      parameters:
+        - $ref: '#/components/parameters/FilterParam'
+        - $ref: '#/components/parameters/PageNumberParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortingFieldParam'
+        - $ref: '#/components/parameters/SortingDirectionParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/ATMList'
+  /atm/nearest:
+    post:
+      description: Get the nearest ATMs
+      operationId: GetNearestATMs
+      tags:
+        - ATM
       requestBody:
         content:
           application/json:
@@ -29,19 +43,9 @@ paths:
           application/xml:
             schema:
               $ref: '#/components/schemas/UserDto'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/UserDto'
       responses:
-        default:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDto'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/UserDto'
+        '200':
+          $ref: '#/components/responses/ATMList'
   /departments:
     get:
       description: List all Departments
@@ -56,7 +60,24 @@ paths:
         - $ref: '#/components/parameters/SortingDirectionParam'
       responses:
         '200':
-          $ref: '#/components/responses/GetDepartmentList'
+          $ref: '#/components/responses/DepartmentList'
+  /departments/nearest:
+    post:
+      description: Get the nearest departments
+      operationId: GetNearestDepartments
+      tags:
+        - Department
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '200':
+          $ref: '#/components/responses/DepartmentList'
 
 components:
 
@@ -100,7 +121,6 @@ components:
           type: string
           enum: [ ASC, DESC ]
 
-
     FilterDto:
       type: object
       properties:
@@ -108,10 +128,10 @@ components:
           type: string
         user.latitude:
           type: integer
-          format: int64
+          format: double
         user.longitude:
           type: integer
-          format: int64
+          format: double
 
     UserDto:
       type: object
@@ -125,6 +145,38 @@ components:
           format: double
           example: 59.9386300
 
+    ATMDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        address:
+          type: string  
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: integer
+          format: double
+        allDay:
+          type: boolean
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceDto'
+
+    ServiceDto:
+      type: object
+      properties:
+        name:
+          type: string
+        serviceCapability:
+          type: string
+          enum: [ SUPPORTED, UNSUPPORTED, UNKNOWN ]
+        serviceActivity:
+          type: string
+          enum: [ SUPPORTED, UNSUPPORTED, UNKNOWN ]
 
     DepartmentDto:
       type: object
@@ -151,7 +203,7 @@ components:
           format: double
         longitude:
           type: integer
-          format: int64
+          format: double
         metroStation:
           type: string
         distance:
@@ -161,8 +213,6 @@ components:
           type: boolean
         myBranch:
           type: boolean
-
-
 
 #  requestBodies:
 #    getOrder:
@@ -191,7 +241,22 @@ components:
 
   responses:
 
-    GetDepartmentList:
+    ATMList:
+      description: List of OrderDto with pagination info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              records:
+                description: List of records to show
+                type: array
+                items:
+                  $ref: '#/components/schemas/ATMDto'
+            allOf:
+              - $ref: '#/components/schemas/PageDto'
+
+    DepartmentList:
       description: List of OrderDto with pagination info
       content:
         application/json:
@@ -205,7 +270,6 @@ components:
                   $ref: '#/components/schemas/DepartmentDto'
             allOf:
               - $ref: '#/components/schemas/PageDto'
-
 
     NotFound:
       description: Not found
