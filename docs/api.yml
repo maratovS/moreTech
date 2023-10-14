@@ -1,0 +1,280 @@
+openapi: "3.0.0"
+
+info:
+  title: API for system
+  version: 0.0.1
+
+servers:
+  - url: http://locahost:8080
+    description: Optional server description, e.g. Main (production) server
+
+tags:
+  - name: atms
+    description: Everything about ATMs
+  - name: Department
+    description: Everything about Departments
+  - name: user
+    description: Operations about user
+
+paths:
+  /user/location:
+    post:
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+  /departments:
+    get:
+      description: List all Departments
+      operationId: GetDepartmentList
+      tags:
+        - Department
+      parameters:
+        - $ref: '#/components/parameters/FilterParam'
+        - $ref: '#/components/parameters/PageNumberParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/SortingFieldParam'
+        - $ref: '#/components/parameters/SortingDirectionParam'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetDepartmentList'
+
+components:
+
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
+
+  schemas:
+    PageDto:
+      description: List of PublisherDto with pagination info
+      required:
+        - page
+        - totalPages
+        - pageSize
+      properties:
+        page:
+          description: Current page
+          type: integer
+          format: int32
+        filter:
+          $ref: '#/components/schemas/FilterDto'
+        totalPages:
+          description: Total page
+          type: integer
+          format: int32
+        pageSize:
+          description: Quantity of records per page
+          type: integer
+          format: int32
+        totalRows:
+          description: total numbers of rows for the request
+          type: integer
+          format: int64
+        sortField:
+          description: sorting field
+          type: string
+        sortDir:
+          description: sorting direction
+          type: string
+          enum: [ ASC, DESC ]
+
+
+    FilterDto:
+      type: object
+      properties:
+        city.name:
+          type: string
+        user.latitude:
+          type: integer
+          format: int64
+        user.longitude:
+          type: integer
+          format: int64
+
+    UserDto:
+      type: object
+      properties:
+        longitude:
+          type: number
+          format: double
+          example: 30.3141300
+        latitude:
+          type: number
+          format: double
+          example: 59.9386300
+
+
+    DepartmentDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        salePointName:
+          type: string
+        address:
+          type: string
+        rko:
+          type: boolean
+        officeType:
+          type: string
+        salePointFormat:
+          type: string
+        suoAvailability:
+          type: boolean
+        hasRamp:
+          type: boolean
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: integer
+          format: int64
+        metroStation:
+          type: string
+        distance:
+          type: integer
+          format: int64
+        kep:
+          type: boolean
+        myBranch:
+          type: boolean
+
+
+
+#  requestBodies:
+#    getOrder:
+#      description: Body for creating Order
+#      required: true
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/OrderDto'
+#
+#    postOrder:
+#      description: Body for creating Order
+#      required: true
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/OrderDto'
+#
+#    putOrder:
+#      description: Body for updating Order
+#      required: true
+#      content:
+#        application/json:
+#          schema:
+#            $ref: '#/components/schemas/OrderDto'
+
+  responses:
+
+    GetDepartmentList:
+      description: List of OrderDto with pagination info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              records:
+                description: List of records to show
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentDto'
+            allOf:
+              - $ref: '#/components/schemas/PageDto'
+
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                description: Message what exactly not found
+                type: string
+              content:
+                description: Optional content
+                type: object
+
+  parameters:
+    PageNumberParam:
+      in: query
+      description: Page number
+      name: pageNumber
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 0
+
+    PageSizeParam:
+      in: query
+      description: Page size
+      name: pageSize
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 10
+
+    SortingFieldParam:
+      in: query
+      description: Sorting field
+      name: sortBy
+      required: false
+      schema:
+        type: string
+        default: id
+
+    SortingDirectionParam:
+      in: query
+      description: Sorting direction
+      name: sortDir
+      required: false
+      schema:
+        type: string
+        enum: [ "ASC", "DESC" ]
+        default: "ASC"
+
+    FilterParam:
+      in: query
+      description: Filter field
+      name: filter
+      required: false
+      explode: false
+      schema:
+        $ref: '#/components/schemas/FilterDto'
+
+    IdPathParam:
+      in: path
+      description: Id of record to operate
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
