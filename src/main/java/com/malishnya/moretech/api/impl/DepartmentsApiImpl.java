@@ -40,6 +40,7 @@ public class DepartmentsApiImpl implements DepartmentApi {
 
     @Override
     public ResponseEntity<GetNearestDepartments200Response> getNearestDepartments(UserDto userDto) {
+        //https://en.wikipedia.org/wiki/Haversine_formula
         double centerLatitude = Math.toRadians(userDto.getLatitude());
         double centerLongitude = Math.toRadians(userDto.getLongitude());
         double radiusKilometers = 1.0;
