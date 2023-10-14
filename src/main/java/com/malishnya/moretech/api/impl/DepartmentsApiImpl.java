@@ -1,10 +1,7 @@
 package com.malishnya.moretech.api.impl;
 
 import com.malishnya.moretech.api.generated.api.DepartmentApi;
-import com.malishnya.moretech.api.generated.model.DepartmentDto;
-import com.malishnya.moretech.api.generated.model.FilterDto;
-import com.malishnya.moretech.api.generated.model.GetDepartmentList200Response;
-import com.malishnya.moretech.api.generated.model.UserDto;
+import com.malishnya.moretech.api.generated.model.*;
 import com.malishnya.moretech.db.model.Department;
 import com.malishnya.moretech.db.repo.DepartmentRepo;
 import org.modelmapper.ModelMapper;
@@ -42,7 +39,26 @@ public class DepartmentsApiImpl implements DepartmentApi {
     }
 
     @Override
-    public ResponseEntity<GetDepartmentList200Response> getNearestDepartments(UserDto userDto) {
-        return DepartmentApi.super.getNearestDepartments(userDto);
+    public ResponseEntity<GetNearestDepartments200Response> getNearestDepartments(UserDto userDto) {
+        double centerLatitude = Math.toRadians(userDto.getLatitude());
+        double centerLongitude = Math.toRadians(userDto.getLongitude());
+        double radiusKilometers = 1.0;
+        double earthRadiusKilometers = 6371.0;
+        double[] latitudes = new double[4];
+        double[] longitudes = new double[4];
+        int i = 0;
+        for (int angle = 0; angle < 360; angle += 90) {
+            double bearing = Math.toRadians(angle);
+            double newLatitude = Math.asin(Math.sin(centerLatitude) * Math.cos(radiusKilometers / earthRadiusKilometers)
+                    + Math.cos(centerLatitude) * Math.sin(radiusKilometers / earthRadiusKilometers) * Math.cos(bearing));
+            double newLongitude = centerLongitude + Math.atan2(Math.sin(bearing) * Math.sin(radiusKilometers / earthRadiusKilometers)
+                    * Math.cos(centerLatitude), Math.cos(radiusKilometers / earthRadiusKilometers) - Math.sin(centerLatitude) * Math.sin(newLatitude));
+            latitudes[i] = Math.toDegrees(newLatitude);
+            longitudes[i] = Math.toDegrees(newLongitude);
+            i++;
+        }
+        List<DepartmentDto> nearestDepartments = repo.findAllByLatitudeBetweenAndLongitudeBetween(latitudes[2], latitudes[0], longitudes[3], longitudes[1])
+                .stream().map(department -> mapper.map(department, DepartmentDto.class)).toList();
+        return ResponseEntity.ok().body(new GetNearestDepartments200Response().records(nearestDepartments));
     }
 }

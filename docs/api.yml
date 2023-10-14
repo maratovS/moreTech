@@ -13,7 +13,9 @@ tags:
   - name: Department
     description: Everything about Departments
 
+
 paths:
+
   /atm:
     get:
       description: List all Departments
@@ -29,6 +31,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/GetATMList'
+
+
   /atm/nearest:
     post:
       description: Get the nearest ATMs
@@ -40,12 +44,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserDto'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/UserDto'
       responses:
         '200':
           $ref: '#/components/responses/GetATMList'
+
+
   /departments:
     get:
       description: List all Departments
@@ -61,6 +64,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/GetDepartmentList'
+
+
   /departments/nearest:
     post:
       description: Get the nearest departments
@@ -72,12 +77,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserDto'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/UserDto'
       responses:
         '200':
-          $ref: '#/components/responses/GetDepartmentList'
+          $ref: '#/components/responses/GetDepartmentNearestList'
 
 components:
 
@@ -250,6 +252,19 @@ components:
                   $ref: '#/components/schemas/DepartmentDto'
             allOf:
               - $ref: '#/components/schemas/PageDto'
+
+    GetDepartmentNearestList:
+      description: List of OrderDto with pagination info
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              records:
+                description: List of records to show
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepartmentDto'
 
     NotFound:
       description: Not found
