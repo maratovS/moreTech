@@ -39,7 +39,9 @@ public class Department {
     private Double longitude;
 
     private String metroStation;
+
     private String network;
+
     private String salePointCode;
 
     private Long distance;
